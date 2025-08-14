@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三角洲行动工具-芹智科技</title>
+    <link rel="icon" href="https://game.gtimg.cn/images/dfm/favicon.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #startBtn {
+          background-color: #5cdb95; /* 浅绿色 */
+          color: white;
+          border: none;
+          padding: 10px 50px; /* 上下12px 左右30px */
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          font-weight: 600;
+          border-radius: 1px; /* 轻微圆角 */
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 轻微阴影 */
+        }
+        
+        /* 鼠标悬停效果 */
+        #startBtn:hover {
+          background-color: #50c489; /* 稍深的绿色 */
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* 点击效果 */
+        #startBtn:active {
+          transform: translateY(1px);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        #imageContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 130%;
+            display: none;
+            z-index: 5;
+        }
+        
+        #customImage {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102, 51, 153, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(102, 51, 153, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(102, 51, 153, 0);
+            }
+        }
+        
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5rem;
+            z-index: 15;
+            display: none;
+        }
+        
+        .loading-spinner {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid #ff00cc;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!--<img id="backgroundImage" src="/static/image/sybj.jpg" alt="背景图片">
+    <h3>三角洲行动工具 by芹智科技</h3>-->
+    <button id="startBtn">三角洲行动工具 by芹智科技</button>
+    <div id="imageContainer">
+        <img id="customImage" src="static/image/syd.jpg" alt="自定义图片">
+    </div>
+    
+    <div class="loading" id="loadingIndicator">
+        <div class="loading-spinner"></div>
+        加载资源中...
+    </div>
+    
+    <audio id="backgroundMusic" loop>
+        <source src="static/music/ndjxjl.mp3" type="audio/mpeg">
+    </audio>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startBtn = document.getElementById('startBtn');
+            const imageContainer = document.getElementById('imageContainer');
+            const customImage = document.getElementById('customImage');
+            const audio = document.getElementById('backgroundMusic');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            
+            // 预加载图片
+            function preloadImage() {
+                loadingIndicator.style.display = 'flex';
+                
+                const img = new Image();
+                img.src = customImage.src;
+                
+                img.onload = function() {
+                    loadingIndicator.style.display = 'none';
+                    imageContainer.style.display = 'block';
+                    
+                    // 播放音频
+                    audio.play()
+                        .then(() => {
+                            // 播放成功
+                        })
+                        .catch(error => {
+                            console.log('自动播放失败:', error);
+                            alert('请点击确认以允许音频播放');
+                            audio.play();
+                        });
+                };
+                
+                img.onerror = function() {
+                    loadingIndicator.style.display = 'none';
+                    alert('图片加载失败，请检查路径: ' + customImage.src);
+                };
+            }
+            
+            // 检查音频文件是否存在
+            function checkAudio() {
+                fetch(audio.querySelector('source').src)
+                    .then(response => {
+                        if (!response.ok) {
+                            loadingIndicator.style.display = 'none';
+                            alert('音频文件未找到，请检查路径: ' + audio.querySelector('source').src);
+                        }
+                    })
+                    .catch(error => {
+                        loadingIndicator.style.display = 'none';
+                        alert('音频文件加载错误: ' + error.message);
+                    });
+            }
+            
+            startBtn.addEventListener('click', function() {
+                // 隐藏按钮
+                startBtn.style.display = 'none';
+                
+                // 显示加载指示器
+                loadingIndicator.style.display = 'flex';
+                
+                // 检查音频文件
+                checkAudio();
+                
+                // 预加载图片
+                preloadImage();
+            });
+        });
+    </script>
+</body>
+</html>
